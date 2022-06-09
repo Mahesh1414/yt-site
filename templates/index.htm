@@ -67,11 +67,19 @@
     <h3>This is the best way to download videos from youtube to your local storage</h3>
     <br><br>
     <h1>Youtube Video Downloader</h1>
+    <div id="form1">
     <form method="post" name="link-form" onsubmit="return main(event)">
     <input type="url" name="url" id="link-text" required>
     <br><br>
     <button type="submit">Fetch Details</button>
     </form>
+    </div>
+
+    <div  style="display: none; opacity: 0;" id="form2" >
+    <form>
+    <button type="submit">Continue</button>
+    </form>
+    </div>
 
     <br><br>
     <div class="about">
@@ -95,15 +103,18 @@
 const flsk_url = "http://127.0.0.1:5000/fetch_url"
 async function main(e){
 e.preventDefault();
-const form = document.forms["link-form"]
-var link = document.getElementById("link-text");
+var link  = document.getElementById("link-text");
+var form1 = document.getElementById("form1");
+var form2 = document.getElementById("form2");
 
 if (link.value < 5){alert("Please Enter a valid Youtube/Youtube Music link"); e.preventDefault(); return}
 
 function done(daaataa){
-   link.style.display = "none";
-   link.style.opacity = 0;
-   alert("now fetched data should be displayed");
+   form1.style.display = "none";
+   form1.style.opacity = 0;
+   form2.style.display = "block";
+   form2.style.opacity = 1;
+   alert("now fetched data should be displayed, select quality and press continue");
 }
 
 function handledd(data){

@@ -4,7 +4,6 @@ bryll = Flask(__name__)
 
 @bryll.route("/fetch_url", methods=["POST"])
 def fetch_url():
-    print(11)
     print(request.form)
 
     try:
