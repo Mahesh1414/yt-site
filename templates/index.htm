@@ -106,22 +106,33 @@ e.preventDefault();
 var link  = document.getElementById("link-text");
 var form1 = document.getElementById("form1");
 var form2 = document.getElementById("form2");
-
+var id    = null
 if (link.value < 5){alert("Please Enter a valid Youtube/Youtube Music link"); e.preventDefault(); return}
 
-function done(daaataa){
+function done(data){
    form1.style.display = "none";
    form1.style.opacity = 0;
    form2.style.display = "block";
    form2.style.opacity = 1;
-   alert("now fetched data should be displayed, select quality and press continue");
+   //id should be sent with every request
+   //or server will deny
+   id = data.id
+   msg = data.msg
+   img = document.createElement("img");
+   img.src = data.thumb
+   img.alt = msg.title
+
+   form2.appendChild(img)
+   alert(msg.title);
 }
 
 function handledd(data){
 console.log(data);
-if (data.status == "Working on it!"){done("here goes fetched data")}
+if (data.status == "info"){done(data)}
 
-else if (data.status == "no link sent????"){alert("Please Enter a Valid Youtube/Youtube Music link"); location.reload();}
+else if (data.status == "error"){
+      alert(data.msg);
+      location.reload();}
 
 else{alert("Please Enter a valid Youtube/Youtube Music link"); location.reload();}
 
