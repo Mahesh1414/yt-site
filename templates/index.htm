@@ -100,7 +100,7 @@
     </div>
 </body>
 <script>
-const flsk_url = "http://127.0.0.1:5000/fetch_url"
+const flsk_url = "http://192.168.8.2:5000/fetch_url"
 async function main(e){
 e.preventDefault();
 var link  = document.getElementById("link-text");
@@ -121,8 +121,12 @@ function done(data){
    img = document.createElement("img");
    img.src = data.thumb
    img.alt = msg.title
-
+   p = document.createElement("p");
+   f = `${'Title:'.bold()} ${msg.title}\n${'Artist:'.bold()} <a href="${msg.channel}">${(msg.artist).bold()}</a>\n${'Length:'.bold()} ${msg.length}\n${'Views:'.bold()} ${msg.hits}\n${'Date:'.bold()} ${msg.udate}\n`;
+   tex = document.createTextNode(f);
+   p.appendChild(tex);
    form2.appendChild(img)
+   form2.appendChild(p)
    alert(msg.title);
 }
 
