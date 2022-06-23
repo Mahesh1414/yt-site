@@ -24,6 +24,7 @@ class pyt:
      self.link  = l
      self.tid   = uuid.uuid4().hex
 
+     self.output = None
      self.stream = None
      self.title  = None
      self.artist = None
@@ -117,7 +118,7 @@ class pyt:
 
         buttonText = f"{res} {tex} {size}"
         if size is None: buttonText = f"{res} {tex}"
-        data = f"{itag} | {mtype} | {is_progressive}"
+        data = f"{itag}|{mtype}|{str(is_progressive).lower()}"
         theButtonsV.append({'tex': buttonText, 'callbk':data})
 
     for stream in a:
@@ -127,7 +128,7 @@ class pyt:
         size = self.humanbytes(stream.filesize_approx)
         buttonText = f"{abr} audio {size}"
         if size is None: buttonText = f"{abr} audio"
-        data = f"{itag} | {mtype} | {False}"
+        data = f"{itag}|{mtype}|false"
         theButtonsA.append({'tex': buttonText, 'callbk':data})
 
     m = {
@@ -168,7 +169,7 @@ class pyt:
            if vItag != "idwV":
               readyV = streams.get_by_itag(vItag)
               typeToDownload = f"V|{self.title}|{self.info}"
-              pathVi = readyV.download(); pathVii, tt = pathVi.split(".mp4")
+              pathVi = readyV.download(output_path="downloads/"); pathVii, tt = pathVi.split(".mp4")
               pathffm = pathVii + ".mp4"
               pathV = pathVii + "V.mp4"
               os.rename(pathVi, f"{pathV}")
@@ -176,7 +177,7 @@ class pyt:
            if aItag != "idwA":
               readyA = streams.get_by_itag(aItag)
               typeToDownload = f"A|{self.title}|{self.info}"
-              pathAu = readyA.download(); pathA, tt = pathAu.split(".mp4")
+              pathAu = readyA.download(output_path="downloads/"); pathA, tt = pathAu.split(".mp4")
               pathffmA = pathA + ".mp3"
               pathA = pathA + "A.mp4"
               os.rename(pathAu, f"{pathA}")
@@ -218,11 +219,10 @@ class pyt:
            return (m,"processed")
     else:
         print('second')
-        pathA = None; pathV = "V"
         vItag = self.getItagV()
         ready = streams.get_by_itag(vItag)
         typeToDownload = f"VA|{self.title}|{self.info}"
-        try: path = ready.download()
+        try: path = ready.download(output_path="downloads/")
         except Exception as e:
            if "429" in str(e):
               print(msg6, str(e))
@@ -233,18 +233,16 @@ class pyt:
            m = await self.reply('error',e,stk0)
            return (m,"processed")
 
-    try:
-       os.system(f"mv '{path}' ./Downloads/")
-       if pathV: os.remove(pathV)
-       if pathA: os.remove(pathA)
-    except Exception as e: print(e)
+#    try:
+#       os.system(f"mv '{path}' ./downloads/")
+#    except Exception as e: print(e)
+    self.output = path
     m = {
        'id': self.tid,
-       'status' : 'info',
+       'status' : 'final',
        'stkr'   : None,
        'thumb'  : self.thumb,
-       'msg'    : self.info,
-       'down'   : path,
+       'msg'    : self.info
        }
 
     return (m,'processed')

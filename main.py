@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, request,jsonify
+from flask import Flask, request, render_template, request,jsonify, send_file
 from tube import pyt
 from stuff import stk2, msg11
 
@@ -37,10 +37,10 @@ async def fetch_url():
 
 @bryll.route("/down", methods=["POST"])
 async def down():
-    print(request.form)
+    print(request.json)
 
     try:
-       id = request.form["id"]
+       id = request.json["id"]
     except Exception as e:
        m = {'id': None,'status':'error','stkr': stk2,'msg': "no id sent"}
        response = jsonify(m)
@@ -54,10 +54,10 @@ async def down():
        return response
 
     pyts     = savedTokens[id]
-    is_progr = request.form["progressive"]
-    mtype    = request.form["mtype"]
-    vtag     = request.form["vtag"]
-    atag     = request.form["atag"]
+    is_progr = request.json["progressive"]
+    mtype    = request.json["mtype"]
+    vtag     = request.json["vtag"]
+    atag     = request.json["atag"]
 
     pyts.setItagV(vtag)
     pyts.setItagA(atag)
@@ -70,6 +70,18 @@ async def down():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+
+@bryll.route("/final/<id>", methods=["GET"])
+async def final(id):
+    if not id in savedTokens:
+       m = {'id': None,'status':'error','stkr': stk2,'msg': "Sorry this Process Expired, resend a link"}
+       response = jsonify(m)
+       response.headers.add("Access-Control-Allow-Origin", "*")
+       return response
+    print(id)
+    pyts = savedTokens[id]
+    path = pyts.output
+    return send_file(path, as_attachment=True)
 
 @bryll.route("/", methods =["GET"])
 async def main():

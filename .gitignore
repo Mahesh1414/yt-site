@@ -16,3 +16,5 @@ Temp/
 temp/
 .cache/
 */__pycache__/
+exm/
+tesr/

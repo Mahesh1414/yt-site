@@ -76,9 +76,9 @@
     </div>
 
     <div  style="display: none; opacity: 0;" id="form2" >
-    <form>
-    <button type="submit">Continue</button>
-    </form>
+    </div>
+
+    <div  style="display: none; opacity: 0;" id="form3" >
     </div>
 
     <br><br>
@@ -100,14 +100,31 @@
     </div>
 </body>
 <script>
-const flsk_url = "http://192.168.8.2:5000/fetch_url"
-async function main(e){
-e.preventDefault();
-var link  = document.getElementById("link-text");
 var form1 = document.getElementById("form1");
 var form2 = document.getElementById("form2");
+var form3 = document.getElementById("form3");
 var id    = null
-if (link.value < 5){alert("Please Enter a valid Youtube/Youtube Music link"); e.preventDefault(); return}
+
+function callbk(d){
+[i,t,p] = d.split("|");
+
+fetch("/down", { method: 'POST', headers: new Headers({'Content-Type': 'application/json'}),
+       body: JSON.stringify({id:id, progressive:p, mtype:t, vtag:i, atag:false}) })
+      .then(response => response.json())
+      .then(data => final(data))
+      .catch(error => console.error('Error!', error.message))
+
+}
+
+function final(data){
+   form2.style.display = "none";
+   form2.style.opacity = 0;
+   form3.style.display = "block";
+   form3.style.opacity = 1;
+   p = document.createElement("p");
+   p.innerHTML = `<a href="/final/${id}"><button>Download</button></a>`
+   form3.appendChild(p)
+}
 
 function done(data){
    form1.style.display = "none";
@@ -121,18 +138,36 @@ function done(data){
    img = document.createElement("img");
    img.src = data.thumb
    img.alt = msg.title
+   vid     = data.buttonsV 
+   aud     = data.buttonsA
+
    p = document.createElement("p");
-   f = `${'Title:'.bold()} ${msg.title}\n${'Artist:'.bold()} <a href="${msg.channel}">${(msg.artist).bold()}</a>\n${'Length:'.bold()} ${msg.length}\n${'Views:'.bold()} ${msg.hits}\n${'Date:'.bold()} ${msg.udate}\n`;
-   tex = document.createTextNode(f);
-   p.appendChild(tex);
+   f = `<b>Title:</b> ${msg.title}<br><b>Artist: <a href="${msg.channel}">${msg.artist}</a></b><br><b>Length:</b> ${msg.length}<br><b>Views:</b> ${msg.hits}<br><b>Date:</b> ${msg.udate}<br>`;
+   p.innerHTML = f;
+
+   p2 = document.createElement("p");
+   for (i in vid){ 
+   p2.innerHTML += `<button onclick="callbk('${vid[i].callbk}')">${vid[i].tex}</button>`}
+
+   p3 = document.createElement("p");
+   for (i in aud){
+   p3.innerHTML += `<button onclick="callbk('${aud[i].callbk}')">${aud[i].tex}</button>`}
+
+
    form2.appendChild(img)
    form2.appendChild(p)
+   form2.appendChild(p2)
+   form2.appendChild(p3)
+
    alert(msg.title);
 }
+
 
 function handledd(data){
 console.log(data);
 if (data.status == "info"){done(data)}
+
+else if (data.status == "final"){final(data)}
 
 else if (data.status == "error"){
       alert(data.msg);
@@ -142,8 +177,12 @@ else{alert("Please Enter a valid Youtube/Youtube Music link"); location.reload()
 
 }
 
+async function main(e){
+e.preventDefault();
+var link  = document.getElementById("link-text");
+if (link.value < 5){alert("Please Enter a valid Youtube/Youtube Music link"); e.preventDefault(); return}
 
-fetch(flsk_url, { method: 'POST', headers: new Headers({'Content-Type': 'application/x-www-form-urlencoded'}), body: 'link='+link.value})
+fetch("/fetch_url", { method: 'POST', headers: new Headers({'Content-Type': 'application/x-www-form-urlencoded'}), body: 'link='+link.value})
       .then(response => response.json())
       .then(data => handledd(data))
       .catch(error => console.error('Error!', error.message))
